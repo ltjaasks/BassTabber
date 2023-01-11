@@ -486,19 +486,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Lauri\\.nuget\\packages\\": {}
+    "C:\\Users\\latej\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Lauri\\source\\repos\\BassTabber\\BassTabber\\BassTabber.csproj",
+      "projectUniqueName": "C:\\Users\\latej\\Source\\Repos\\BassTabber\\BassTabber\\BassTabber.csproj",
       "projectName": "BassTabber",
-      "projectPath": "C:\\Users\\Lauri\\source\\repos\\BassTabber\\BassTabber\\BassTabber.csproj",
-      "packagesPath": "C:\\Users\\Lauri\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Lauri\\source\\repos\\BassTabber\\BassTabber\\obj\\",
+      "projectPath": "C:\\Users\\latej\\Source\\Repos\\BassTabber\\BassTabber\\BassTabber.csproj",
+      "packagesPath": "C:\\Users\\latej\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\latej\\Source\\Repos\\BassTabber\\BassTabber\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Lauri\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\latej\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -552,7 +552,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -15,12 +15,22 @@ namespace BassTabber
         readonly int BitDepth = 16;
         readonly int ChannelCount = 1;
         readonly int BufferMilliseconds = 50;
+        int Tempo;
+        int Isku;
 
-        double PiikkiTaajuus;
+        int PiikkiTaajuus;
 
         StringBuilder[] TabSb = new StringBuilder[4];
+        List<String> Tahdit = new List<string>();
 
-
+        int[][] oteLauta = new int[][]
+        {
+            new int[] {98, 104, 110, 117, 123, 131, 139, 147, 156, 165, 175, 185, 196, 208, 220, 233, 247, 262, 277, 294, 311},
+            new int[] {73, 78, 82, 87, 92, 98, 104, 110, 117, 123, 131, 139, 147, 156, 165, 175, 185, 196, 208, 220, 233, 247},
+            new int[] {55, 58, 62, 65, 69, 73, 78, 82, 87, 92, 98, 104, 110, 117, 123, 131, 139, 147, 156, 165, 175, 185, 196},
+            new int[] {41, 44, 46, 49, 52, 55, 58, 62, 65, 69, 73, 78, 82, 87, 92, 98, 104, 110, 117, 123, 131, 139, 147, 156}
+        };
+         
 
         public Form1()
         {
@@ -37,7 +47,6 @@ namespace BassTabber
 
             double FftPeriod = FftSharp.Transform.FFTfreqPeriod(SampleRate, FftMag.Length);
 
-
             ///Alustetaan ‰‰nilaite input
             AaniIn = new NAudio.Wave.WaveInEvent
             {
@@ -48,9 +57,14 @@ namespace BassTabber
 
             ///Kutsutaan tapahtumank‰sittelij‰‰ AaniIn_DataAvailable kun uutta dataa ‰‰nilaitteesta
             AaniIn.DataAvailable += AaniIn_DataAvailable;
-            
-
         }
+
+
+        private int GetTempo()
+        {
+            return Tempo;
+        }
+
 
         /*
          * Lis‰‰ ‰‰nilaitteet listboxiin TO:DO k‰ytt‰j‰n valittavaksi
@@ -84,7 +98,7 @@ namespace BassTabber
         }
 
 
-        private double AaniTaajuus()
+        private int AaniTaajuus()
         {
             var window = new FftSharp.Windows.Hamming();
             double[] PaddedAudio = FftSharp.Pad.ZeroPad(AudioAanitys);
@@ -106,8 +120,9 @@ namespace BassTabber
             double FftPeriod = FftSharp.Transform.FFTfreqPeriod(SampleRate, FftMag.Length);
             double PiikkiTaajuus = FftPeriod * Piikki;
 
-            return PiikkiTaajuus;
+            return Convert.ToInt32(PiikkiTaajuus);
         }
+
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -126,14 +141,84 @@ namespace BassTabber
         private void timer1_Tick(object sender, EventArgs e)
         {
             label1.Text = $"{PiikkiTaajuus:N0}";
-            for (int i = 0; i < TabSb.Length; i++)
-                TabSb[i].Append("ó");
+            Kirjoita();
+        }
+
+        /// <summary>
+        /// Etsii taulukosta oteLauta ‰‰nilaitteen taajuutta vastaavan v‰lin
+        /// </summary>
+        /// <param name="taajuus">ƒ‰nilaitteen poimima taajuus</param>
+        /// <returns>
+        /// Taajuutta vastaava v‰li tai -1
+        /// </returns>
+        private (int, int) EtsiVali(int taajuus)
+        {
+            for (int i = 0; i < oteLauta.Length; i++)
+            {
+                for (int j = oteLauta[i].Length - 1; j >= 0; j--)
+                {
+                    if (taajuus == oteLauta[i][j]) return (i, j);
+                    if (taajuus > oteLauta[i][j])
+                    {
+                        return (i, j);
+                    }
+                }
+            }
+            return (-1, -1);
+        }
+
+
+        private void Kirjoita()
+        {
+            var Aani = (-1, -1);
+            Isku++;
+            if (PiikkiTaajuus != 0)
+                Aani = EtsiVali(PiikkiTaajuus);
+
             
+            for (int i = 0; i < TabSb.Length; i++)
+            {
+                if (i == Aani.Item1)
+                {
+                    TabSb[Aani.Item1].Append(Aani.Item2 + "ó");
+                } else
+                {
+                    TabSb[i].Append("óó");
+                }
+
+                if (Isku == 32)
+                    TabSb[i].Append("|");
+            }
+
+            if (Isku == 32)
+            {
+                StringBuilder Sb = new StringBuilder("");
+                for (int i = 0; i < TabSb.Length; i++)
+                {
+                    Sb.Append(TabSb[i].ToString() + "\n");
+                    TabSb[i].Clear();
+                }
+                Tahdit.Add(Sb.ToString());
+                Isku = 0;
+            }
+
             Tab.Clear();
+
+            for (int i = 0; i < Tahdit.Count; i++)
+                Tab.AppendText(Tahdit[i] + "\n");
             for (int i = 0; i < TabSb.Length; i++)
                 Tab.AppendText(TabSb[i].ToString() + "\n");
         }
 
 
+        private void tempoBox_TextChanged(object sender, EventArgs e)
+        {
+            int.TryParse(tempoBox.Text, out Tempo);
+            label2.Text = $"{Tempo}bpm";
+            if (Tempo != 0)
+            {
+                timer1.Interval = 15000 / Tempo;
+            }
+        }
     }
 }
