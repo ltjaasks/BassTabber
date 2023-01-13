@@ -1,4 +1,5 @@
 using NAudio.Wave;
+using System.ComponentModel.Design.Serialization;
 using System.Text;
 using System.Timers;
 
@@ -138,6 +139,16 @@ namespace BassTabber
             timer1.Enabled = false;
         }
 
+
+        private void clear(object sender, EventArgs e)
+        {
+            for (int i = 0; i < TabSb.Length; i++)
+                TabSb[i] = new StringBuilder("");
+            Tahdit.Clear();
+            Tab.Clear();
+            Isku = 0;
+        }
+
         private void timer1_Tick(object sender, EventArgs e)
         {
             label1.Text = $"{PiikkiTaajuus:N0}";
@@ -151,20 +162,54 @@ namespace BassTabber
         /// <returns>
         /// Taajuutta vastaava väli tai -1
         /// </returns>
-        private (int, int) EtsiVali(int taajuus)
+        /*private (int, int) EtsiVali(int taajuus)
         {
-            for (int i = 0; i < oteLauta.Length; i++)
+            for (int i = oteLauta.Length - 1; i >= 0; i--)
             {
-                for (int j = oteLauta[i].Length - 1; j >= 0; j--)
+                for (int j = 0; j < oteLauta[i].Length - 1; j++)
                 {
                     if (taajuus == oteLauta[i][j]) return (i, j);
-                    if (taajuus > oteLauta[i][j])
+                    if (taajuus < oteLauta[i][j])
                     {
+                        if (j - 1 == 0) return (i, j);
+                        if (EtsiLahempi(oteLauta[i][j], oteLauta[i][j - 1], taajuus))
+                            return (i, j - 1);
                         return (i, j);
                     }
                 }
             }
             return (-1, -1);
+        }*/
+
+
+        private (int, int) EtsiVali(int taajuus)
+        {
+            for (int i = 0; i < oteLauta[0].Length - 2; i++)
+            {
+                for (int j = 0; j < oteLauta.Length; j++)
+                {
+                    if (taajuus == oteLauta[j][i])
+                        return (i, j);
+                    if (oteLauta[j][i] < taajuus && taajuus < oteLauta[j][i + 1])
+                    {
+                        if (EtsiLahempi(oteLauta[j][i + 1], oteLauta[j][i], taajuus))
+                            return (j, i);
+                        return (j, i + 1);
+                    }
+                }
+            }
+            return (-1, -1);
+        }
+
+        /// <summary>
+        /// Etsii taajuutta lähempänä olevan välin jos taajuus on nauhojen välissä
+        /// </summary>
+        /// <param name="korkea"></param>
+        /// <param name="matala"></param>
+        /// <returns>True, jos matala on lähempänä taajuutta. False jos korkea on lähempänä taajuutta</returns>
+        private bool EtsiLahempi(int korkea, int matala, int taajuus)
+        {
+            return Math.Abs(taajuus - matala) < Math.Abs(taajuus - korkea);
         }
 
 
@@ -220,5 +265,7 @@ namespace BassTabber
                 timer1.Interval = 15000 / Tempo;
             }
         }
+
+
     }
 }
